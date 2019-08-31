@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible">
+    <title>Nerd's Room | Upload</title>
+    <link rel="stylesheet" href="/styles/sidebar.css">
+    <link rel="stylesheet" href="/styles/menu.css" />
+    <link rel="stylesheet" href="/styles/settings.css" />
+</head>
+<body>
+  <div class="sidebar">
+    <a href="/upload">Upload</a>
+    <a class="active" href="/settings">Settings</a>
+    <a href="/logout">Log Out</a>
+  </div>
+  <div class="content">
+    <h1>Add User</h1>
+    <form method="post">
+      <input type="text" name=username placeholder="Username"><br>
+      <input type="password" name=pass placeholder="Password"><br>
+      <select name="privileges">
+      {% for opt in privs %}
+        <option value="{{opt.val}}">{{opt.desc}}</option>
+      {% endfor %}
+      </select>
+      <input type="submit" value=Submit>
+    </form>
+    {% if error %}
+      <p class="error"><strong>Error:</strong> {{ error }}</p>
+    {% endif %}
+  </div>
+</body>
+</html>

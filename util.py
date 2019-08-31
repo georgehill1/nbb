@@ -13,7 +13,7 @@ def file_from_store(file_name):
     """
     with open(file_name, 'r') as f:
         content = f.read()
-    
+
     return content
 
 def get_posts():
@@ -25,6 +25,56 @@ def get_posts():
             "title": p[0],
             "image": p[5],
             "description": p[4]} for p in posts]
+
+    conn.close()
+    return ret
+
+def get_priv_choices(user):
+    lvl = privFromUser(user)
+    ret = []
+    if lvl <= 3:
+        ret.append({"val": 3, "desc": privLookup(3)})
+    if lvl <= 2:
+        ret.append({"val": 2, "desc": privLookup(2)})
+    if lvl <= 1:
+        ret.append({"val": 1, "desc": privLookup(1)})
+    if lvl == 0:
+        ret.append({"val": 0, "desc": privLookup(0)})
+    return ret
+
+def privFromUser(user):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("SELECT priveleges FROM users WHERE username = '{}';".format(user))
+    users = c.fetchone()
+    ret = int(users[0])
+    conn.close()
+    return ret
+
+def privLookup(privs):
+    # privileges
+    # 0 - admin - create and remove users +
+    # 1 - writer - create, and remove posts +
+    # 2 - publisher - publish posts
+    # 3 - nothing - nothing
+    if privs == 0:
+        return "Administrator"
+    if privs == 1:
+        return "Writer"
+    if privs == 2:
+        return "Publisher"
+    if privs == 3:
+        return "None"
+    return "Error"
+
+def get_users():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM users;")
+    users = c.fetchall()
+    ret = [{"user": u[0],
+            "priv": privLookup(u[2])
+            } for u in users]
 
     conn.close()
     return ret
@@ -55,14 +105,6 @@ def validate_creds(username, password):
     else:
         conn.close()
         return valid, None
-
-    # privileges
-    # 0 - admin
-    # 1 - writer
-    # 2 - publisher
-    # 3 - nothing
-
-
     return valid, row[0]
 
 def create_user(username, password):
@@ -80,7 +122,7 @@ def create_user(username, password):
     conn.close()
 
 def set_password(username, password):
-    # TODO - 
+    # TODO -
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute("UPDATE users SET pass_hash=? WHERE username=?;", (sha256_crypt.hash(password), username))

@@ -11,20 +11,30 @@
 </head>
 <body>
   <div class="sidebar">
-    <a class="active" href="/upload">Upload</a>
-    <a href="/settings">Settings</a>
+    <a href="/upload">Upload</a>
+    <a class="active" href="/settings">Settings</a>
     <a href="/logout">Log Out</a>
   </div>
   <div class="content">
-    <h1>Upload New</h1>
-    <form>
-      <input type="file" name=file><br>
-      <input type="text" name=title placeholder="Post Title"><br>
-      <textarea name=description placeholder="Description"></textarea><br>
-      <input type="file" name=image><br>
-      <input type="date" name="publish"><br>
-      <input type="submit" value=Upload>
-    </form>
+    <h1>Settings</h1>
+    <h2>Users</h2>
+    <table>
+      <thead>
+        <th>User</th>
+        <th>Privileges</th>
+        {% for item in users %}
+        <tr>
+          <td>
+            {{ item.user }}
+          </td>
+          <td>
+            {{ item.priv }}
+          </td>
+        </tr>
+        {% endfor %}
+      </thead>
+    </table>
+    <a href="/adduser">Add User</button>
   </div>
 </body>
 </html>
