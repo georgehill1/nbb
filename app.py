@@ -53,6 +53,10 @@ def logout():
 def secret():
     return render_template("upload.html")
 
+@app.route("/random.html")
+def random():
+    pass
+
 
 @app.route("/<postname>")
 def get_post(postname):
