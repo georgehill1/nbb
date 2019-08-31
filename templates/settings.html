@@ -30,11 +30,20 @@
           <td>
             {{ item.priv }}
           </td>
+          <td>
+          {% if privFromUser(session.get('user_id')) == 0 %}
+            <a href="/modifyuser/{{item.user}}">Modify</a>
+          {% elif session.get('user_id') == {{item.user}} %}
+            <a href="/modifyuser/{{item.user}}">Modify</a>
+          {% endif %}
+          </td>
         </tr>
         {% endfor %}
       </thead>
     </table>
+    {% if privFromUser(session.get('user_id')) == 0 %}
     <a href="/adduser">Add User</button>
+    {% endif %}
   </div>
 </body>
 </html>

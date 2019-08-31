@@ -62,18 +62,19 @@ def login():
             error = 'Invalid Credentials. Please try again.'
         else:
             session['user_id'] = user
-            return redirect('/upload')
+            return redirect('/settings')
     if session.get('user_id'):
-        return redirect('/upload')
+        return redirect('/settings')
     return render_template('login.html', error=error)
 
 @app.route("/logout")
 def logout():
     session.pop('user_id', None)
-    return redirect("/login")
+    return redirect("/")
 
 @app.route("/upload", methods=['GET', 'POST'])
 @ensure_logged_in
+@ensure_writer
 def secret():
     return render_template("upload.html")
 
@@ -98,9 +99,34 @@ def adduser():
         password = request.form['pass']
         privileges = request.form['privileges']
         error = create_user(username, password)
+        error += set_privileges(username, privileges)
         if error == None:
             return redirect("/settings")
     return render_template("add_user.html", privs=get_priv_choices(session.get('user_id')), error=error)
+
+@app.route("/createuser", methods=['GET', 'POST'])
+def createuser():
+    error = None
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        password_conf = request.form['password-conf']
+        if password != password_conf:
+            error = "Passwords do not match"
+        else:
+            error = create_user(username, password)
+            if error == None:
+                return redirect("/settings")
+    return render_template("createuser.html", error=error)
+
+@app.route("/modifyuser/<username>", methods=['GET', 'POST'])
+@ensure_logged_in
+def modifyuser(username):
+    error = None
+    if request.method == 'POST':
+        pass
+    return render_template("modifyuser.html", username=username)
+
 
 @app.route("/metrics")
 @ensure_logged_in

@@ -122,10 +122,16 @@ def create_user(username, password):
     conn.close()
 
 def set_password(username, password):
-    # TODO -
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute("UPDATE users SET pass_hash=? WHERE username=?;", (sha256_crypt.hash(password), username))
+    conn.commit()
+    conn.close()
+
+def set_privileges(username, privs):
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    c = conn.cursor()
+    c.execute("UPDATE users SET pass_hash=? WHERE username=?;", (privs, username))
     conn.commit()
     conn.close()
 
