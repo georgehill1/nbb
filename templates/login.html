@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NerdBROKEN | Login</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Log in</h1>
+        <br>
+        <form action="" method="post">
+            <input type="text" name="username" placeholder="Username" value="{{ request.form.username }}">
+            <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}">
+            <input type="submit" value="Login">
+        </form>
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 10px;
+}
+
+.card {
+  flex: 33.333%;
+  max-width: 33.333%;
+  padding: 0 10px;
+}
+
+.card img {
+  margin-top: 8px;
+  vertical-align: middle;
+  width: 100%;
+  border-radius: 20px 20px 0 0;
+}
+
+.card .card-title {
+  font-family: Raleway, Helvetica, sans-serif;
+  font-size: 1.5em;
+  font-weight: bolder;
+  text-decoration: none;
+  color: black;
+  border-bottom: 4px #ff6f2e solid;
+  transition: border-bottom 0.3s;
+}
+
+.card .card-title:hover {
+  border-bottom: 4px #68c7ff solid;
+}
+
+.mainbody {
+  position: relative;
+  max-width: 75%;
+  left: 12.5%;
+}
+
+@media screen and (max-width: 1007px) {
+  .card {
+    flex: 50%;
+    max-width: 50%;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .mainbody {
+    position: relative;
+    max-width: 100%;
+    left: 0;
+  }
+
+  .card {
+    flex: 100%;
+    max-width: 100%;
+  }
+}
+
+.card {
+  transition: transform .2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card a {
+  text-decoration: none;
+}
+
+.button-rm {
+  background-color: #ff6f2e;
+  text-align: center;
+  padding: 10px 0;
+  margin-bottom: 15px;
+  color: white;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+  border-radius: 0 0 20px 20px;
+  /*border-radius: 0 20px 0 20px;
+  border-radius: 20px 0 20px 0;
+  border-radius: 20px 20px 0 0;*/
+}
+
+.button-rm:hover {
+  /*background-color: #f9a66b;*/
+  background-color: #68c7ff;
+  color: black;
+}
