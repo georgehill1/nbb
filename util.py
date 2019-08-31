@@ -1,6 +1,6 @@
 import psycopg2
 
-import time
+import os, time
 
 from passlib.hash import sha256_crypt
 
