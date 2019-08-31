@@ -1,8 +1,10 @@
-import sqlite3
+import psycopg2
 
 import time
 
 from passlib.hash import sha256_crypt
+
+DATABASE_URL = os.environ['DATABASE_URL']
 
 def file_from_store(file_name):
     """
@@ -17,7 +19,7 @@ def file_from_store(file_name):
     return content
 
 def get_posts():
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute("SELECT * FROM posts;")
     posts = c.fetchall()
@@ -43,7 +45,7 @@ def get_priv_choices(user):
     return ret
 
 def privFromUser(user):
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute("SELECT priveleges FROM users WHERE username = '{}';".format(user))
     users = c.fetchone()
@@ -68,7 +70,7 @@ def privLookup(privs):
     return "Error"
 
 def get_users():
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute("SELECT * FROM users;")
     users = c.fetchall()
@@ -80,8 +82,7 @@ def get_users():
     return ret
 
 def add_post_to_database(title, slug, author_id, publish_date, thumb, description, content):
-    # TODO - get database from GCS
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
 
     # TODO - put actual post in store
@@ -92,10 +93,9 @@ def add_post_to_database(title, slug, author_id, publish_date, thumb, descriptio
     conn.commit()
 
     conn.close()
-    # TODO - post database to GCS
 
 def validate_creds(username, password):
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     valid = False
     c = conn.cursor()
     c.execute("SELECT * FROM users WHERE username = '{}';".format(username))
@@ -108,7 +108,7 @@ def validate_creds(username, password):
     return valid, row[0]
 
 def create_user(username, password):
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     # Check existing
     c.execute("SELECT * FROM users WHERE username={};".format(repr(username)))
@@ -123,7 +123,7 @@ def create_user(username, password):
 
 def set_password(username, password):
     # TODO -
-    conn = sqlite3.connect('database.db')
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
     c.execute("UPDATE users SET pass_hash=? WHERE username=?;", (sha256_crypt.hash(password), username))
     conn.commit()
