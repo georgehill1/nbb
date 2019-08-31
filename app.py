@@ -3,6 +3,7 @@ from util import file_from_store, get_posts, validate_creds, get_users, get_priv
 from flask import Flask, render_template, send_file, redirect, url_for, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import random
 
 import os
 
@@ -109,8 +110,10 @@ def metrics():
 @app.route("/random.html")
 def rando():
     # TODO
-    post = get_posts();
-    return redirect("/")
+    posts = get_posts();
+    r = random.randint(0, len(posts))
+
+    return redirect(posts[r]['href'])
 
 @app.route("/about.html")
 def about():
