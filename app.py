@@ -87,7 +87,7 @@ def low_auth():
 @app.route("/users")
 @ensure_logged_in
 def settings():
-    return render_template("settings.html", users=get_users())
+    return render_template("settings.html", users=get_users(), privLvl = privFromUser(session.get('user_id')), user=session.get('user_id'))
 
 @app.route("/adduser", methods=['GET', 'POST'])
 @ensure_logged_in
