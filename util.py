@@ -117,21 +117,21 @@ def create_user(username, password):
         conn.close()
         return "USER EXISTS"
     # Insert
-    c.execute("INSERT INTO users VALUES (?, ?, ?);", (username, sha256_crypt.hash(password), 3))
+    c.execute("INSERT INTO users VALUES (%s, %s, %s);", (username, sha256_crypt.hash(password), 3))
     conn.commit()
     conn.close()
 
 def set_password(username, password):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
-    c.execute("UPDATE users SET pass_hash=? WHERE username=?;", (sha256_crypt.hash(password), username))
+    c.execute("UPDATE users SET pass_hash='%s' WHERE username='%s';", (sha256_crypt.hash(password), username))
     conn.commit()
     conn.close()
 
 def set_privileges(username, privs):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
-    c.execute("UPDATE users SET pass_hash=? WHERE username=?;", (privs, username))
+    c.execute("UPDATE users SET priveleges=%s WHERE username=%s;", (privs, username))
     conn.commit()
     conn.close()
 

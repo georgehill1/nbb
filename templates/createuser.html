@@ -12,8 +12,8 @@
         <form action="" method="post">
             <input type="text" name="username" placeholder="Username" value="{{ request.form.username }}">
             <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}">
-            <input type="password" placeholder="Password" name="password-conf" value="{{ request.form.password }}">
-            <input type="submit" value="Login">
+            <input type="password" placeholder="Confirm Password" name="password-conf" value="{{ request.form.password }}">
+            <input type="submit" value="Create">
         </form>
         <a href="/createuser">Create Account</button>
         {% if error %}
