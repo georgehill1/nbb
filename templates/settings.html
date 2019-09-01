@@ -33,7 +33,7 @@
           <td>
           {% if privFromUser(session.get('user_id')) == 0 %}
             <a href="/modifyuser/{{item.user}}">Modify</a>
-          {% elif session.get('user_id') == {{item.user}} %}
+          {% elif session.get('user_id') == item.user %}
             <a href="/modifyuser/{{item.user}}">Modify</a>
           {% endif %}
           </td>
@@ -42,7 +42,7 @@
       </thead>
     </table>
     {% if privFromUser(session.get('user_id')) == 0 %}
-    <a href="/adduser">Add User</button>
+      <a href="/adduser">Add User</button>
     {% endif %}
   </div>
 </body>

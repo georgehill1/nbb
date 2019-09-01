@@ -100,11 +100,7 @@ def adduser():
         privileges = request.form['privileges']
         error = create_user(username, password)
         error += set_privileges(username, privileges)
-        logged_in, user = validate_creds(username, password)
-        if not logged_in:
-            error += 'Invalid Credentials. Please try again.'
         if error == None:
-            session['user_id'] = user
             return redirect("/settings")
     return render_template("add_user.html", privs=get_priv_choices(session.get('user_id')), error=error)
 
@@ -119,7 +115,11 @@ def createuser():
             error = "Passwords do not match"
         else:
             error = create_user(username, password)
+            logged_in, user = validate_creds(username, password)
+            if not logged_in:
+                error += 'Invalid Credentials. Please try again.'
             if error == None:
+                session['user_id'] = user
                 return redirect("/settings")
     return render_template("createuser.html", error=error)
 
