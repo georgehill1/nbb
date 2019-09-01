@@ -41,7 +41,7 @@
         {% endfor %}
       </thead>
     </table>
-    {% if privFromUser(session.get('user_id')) == 0 %}
+    {% if privLvl == 0 %}
       <a href="/adduser">Add User</button>
     {% endif %}
   </div>

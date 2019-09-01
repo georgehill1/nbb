@@ -17,14 +17,21 @@
   </div>
   <div class="content">
     <h1>Upload New</h1>
-    <form>
-      <input type="file" name=file><br>
-      <input type="text" name=title placeholder="Post Title"><br>
-      <textarea name=description placeholder="Description"></textarea><br>
-      <input type="file" name=image><br>
-      <input type="date" name="publish"><br>
-      <input type="submit" value=Upload>
-    </form>
+    {% if privLvl == 0 %}
+      <form>
+        <input type="file" name=file><br>
+        <input type="text" name=title placeholder="Post Title"><br>
+        <textarea name=description placeholder="Description"></textarea><br>
+        <input type="file" name=image><br>
+        <input type="date" name="publish"><br>
+        <input type="submit" value=Upload>
+      </form>
+    {% else %}
+    <h2>Permission Denied</h2>
+    <p>
+      Sorry, you don't have permission to upload new posts. Try speaking to the sysadmin if you think this is a mistake.
+    </p>
+    {% endif %}
   </div>
 </body>
 </html>
