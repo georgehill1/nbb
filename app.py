@@ -76,7 +76,7 @@ def logout():
 @ensure_logged_in
 @ensure_writer
 def secret():
-    return render_template("upload.html")
+    return render_template("upload.html", privLvl = privFromUser(session.get('user_id')))
 
 @app.route("/auth_too_low")
 @ensure_logged_in
