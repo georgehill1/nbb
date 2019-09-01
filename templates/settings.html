@@ -33,7 +33,7 @@
           <td>
           {% if privLvl == 0 %}
             <a href="/modifyuser/{{item.user}}">Modify</a>
-          {% user == item.user %}
+          {% elif user == item.user %}
             <a href="/modifyuser/{{item.user}}">Modify</a>
           {% endif %}
           </td>
