@@ -16,19 +16,20 @@
   <div class="sidebar">
     <a class="active" href="/upload">Upload</a>
     <a href="/settings">Settings</a>
+    <a href="/posts">Posts</a>
     <a href="/logout">Log Out</a>
   </div>
   <div class="content">
     <h1>Upload New</h1>
     {% if privLvl == 0 %}
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
       <input type="text" name=title placeholder="Post Title"><br>
-      <textarea name=description placeholder="Description"></textarea><br>
+      <input type="text" name=description placeholder="Description"></input><br>
       <label>Thumbnail</label>
       <input type="file" name=thumb><br>
       <label>Date to publish</label>
       <input type="date" name="publish"><br>
-      <textarea name="content" id="editor">This is some sample content.</textarea>
+      <textarea name="content" id="editor">{{ preContent|safe }}</textarea>
       <script>
         ClassicEditor
           .create( document.querySelector( '#editor' ), {

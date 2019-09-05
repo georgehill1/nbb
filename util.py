@@ -20,14 +20,12 @@ def uploadImage(img):
     payload = {'image': b64encode(img.read())}
     url = "https://api.imgur.com/3/image"
 
-    # requests.get("https://api.imgur.com/3/image/{id}")
     resp = requests.post(url, headers=headers, data=payload)
     lnk = resp.json()['data']['link']
     return lnk
 
 def notFound():
-    # TODO return render_template("notFound.html")
-    return "404 Not found", 404
+    return render_template("notFound.html"), 404
 
 def file_from_store(file_name):
     """
@@ -46,15 +44,43 @@ def file_from_store(file_name):
         print(e)
         return notFound()
 
+def get_content(slug):
+    # TODO
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    c = conn.cursor()
+    c.execute("SELECT title, content FROM posts WHERE slug = %s", (slug,))
+
 def get_posts():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
-    c.execute("SELECT slug, title, thumb, description FROM posts;")
+    c.execute("SELECT slug, title, thumb, description FROM posts WHERE publish_date < %s;", (int(time.time()),))
     posts = c.fetchall()
     ret = [{"href": p[0],
             "title": p[1],
             "image": p[2],
             "description": p[3]} for p in posts]
+
+    conn.close()
+    return ret
+
+def get_published_posts():
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    c = conn.cursor()
+    c.execute("SELECT title, slug FROM posts WHERE publish_date < %s;", (int(time.time()),))
+    posts = c.fetchall()
+    ret = [{"title": p[0],
+            "slug": p[1]} for p in posts]
+
+    conn.close()
+    return ret
+
+def get_unpublished_posts():
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    c = conn.cursor()
+    c.execute("SELECT title, slug FROM posts WHERE publish_date > %s;", (int(time.time()),))
+    posts = c.fetchall()
+    ret = [{"title": p[0],
+            "slug": p[1]} for p in posts]
 
     conn.close()
     return ret

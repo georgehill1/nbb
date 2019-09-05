@@ -1,4 +1,4 @@
-from util import file_from_store, get_posts, validate_creds, get_users, get_priv_choices, privFromUser, create_user, set_password, uploadImage, create_post
+from util import file_from_store, get_posts, validate_creds, get_users, get_priv_choices, privFromUser, create_user, set_password, uploadImage, create_post, set_privileges, get_published_posts, get_unpublished_posts
 
 from flask import Flask, render_template, send_file, redirect, url_for, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -88,15 +88,26 @@ def logout():
 @ensure_writer
 def upload():
     if request.method == 'POST':
-        # title, author_id, publish_date, thumb, description, content
         try:
-            uploadedThumb = ""
+            file = request.files['thumb']
+            print(file)
+            uploadedThumb = uploadImage(file)
             create_post(request.form['title'], session.get('user_id'), request.form['publish'], uploadedThumb, request.form['description'], request.form['content'])
+            return "Success!"
         except Exception as e:
             print(e)
             return "failed"
         return redirect("/upload")
-    return render_template("upload.html", privLvl = privFromUser(session.get('user_id')))
+    return render_template("upload.html", privLvl = privFromUser(session.get('user_id')), preContent="Here is some sample content.")
+
+@app.route("/posts")
+@ensure_logged_in
+@ensure_publisher
+def unpublishedposts():
+    published = get_published_posts()
+    unpublished = get_unpublished_posts()
+
+    return render_template("unpublished.html", published=published, unpublished=unpublished)
 
 @app.route("/auth_too_low")
 @ensure_logged_in
@@ -106,6 +117,7 @@ def low_auth():
 @app.route("/settings")
 @app.route("/users")
 @ensure_logged_in
+@ensure_publisher
 def settings():
     return render_template("settings.html", users=get_users(), privLvl = privFromUser(session.get('user_id')), user=session.get('user_id'))
 
@@ -119,7 +131,7 @@ def adduser():
         password = request.form['pass']
         privileges = request.form['privileges']
         error = create_user(username, password)
-        error += set_privileges(username, privileges)
+        error = set_privileges(username, privileges)
         if error == None:
             return redirect("/settings")
     return render_template("add_user.html", privs=get_priv_choices(session.get('user_id')), error=error)
@@ -137,7 +149,7 @@ def createuser():
             error = create_user(username, password)
             logged_in, user = validate_creds(username, password)
             if not logged_in:
-                error += 'Invalid Credentials. Please try again.'
+                error = 'Invalid Credentials. Please try again.'
             if error == None:
                 session['user_id'] = user
                 return redirect("/settings")
