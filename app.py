@@ -1,4 +1,4 @@
-from util import file_from_store, get_posts, validate_creds, get_users, get_priv_choices, privFromUser, create_user, set_password
+from util import file_from_store, get_posts, validate_creds, get_users, get_priv_choices, privFromUser, create_user, set_password, uploadImage, create_post
 
 from flask import Flask, render_template, send_file, redirect, url_for, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,9 +6,10 @@ from functools import wraps
 import random
 
 import os
+import json
 
 app = Flask(__name__, static_url_path='/static')
-app.config['SECRET_KEY'] = r"e,4zLtWXcD.5Ca^3Mm^!'l+6H#S>W4c)AI2K<:}}cXVq{D2YVs]C6qW-cGEm&ZZ"
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
 
 def ensure_logged_in(fn):
     @wraps(fn)
@@ -47,9 +48,19 @@ def home_page():
 def get_image(image_name):
     return send_file("img/" + image_name)
 
-@app.route("/favicon.ico")
-def get_favicon():
-    return get_image("favicon.ico")
+# @app.route("/favicon.ico")
+# def get_favicon():
+#     return get_image("favicon.ico")
+
+# JSON spec
+# [
+# {
+# "type": "text",
+# "content": "Lipsum crap",
+# }
+# "type": "image",
+# "content": "<imgur embed code>"
+# ]
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -75,7 +86,16 @@ def logout():
 @app.route("/upload", methods=['GET', 'POST'])
 @ensure_logged_in
 @ensure_writer
-def secret():
+def upload():
+    if request.method == 'POST':
+        # title, author_id, publish_date, thumb, description, content
+        try:
+            uploadedThumb = ""
+            create_post(request.form['title'], session.get('user_id'), request.form['publish'], uploadedThumb, request.form['description'], request.form['content'])
+        except Exception as e:
+            print(e)
+            return "failed"
+        return redirect("/upload")
     return render_template("upload.html", privLvl = privFromUser(session.get('user_id')))
 
 @app.route("/auth_too_low")
@@ -127,10 +147,27 @@ def createuser():
 @ensure_logged_in
 def modifyuser(username):
     error = None
+    if privFromUser(session.get('user_id')) != 0:
+        if session.get('user_id') != username:
+            return redirect("/auth_too_low")
     if request.method == 'POST':
-        pass
-    return render_template("modifyuser.html", username=username)
-
+        try:
+            password = request.form['password']
+            password_conf = request.form['password-conf']
+        except:
+            password = None
+            password_conf = None
+        try:
+            privileges = request.form['privileges']
+        except:
+            privileges = None
+        if password_conf != password and password != None:
+            error = "Passwords do not match!"
+        elif privileges != None:
+            set_privileges(username, privileges)
+        elif password != None and password_conf != None:
+            set_password(username, password)
+    return render_template("modifyuser.html", username=username, privs=get_priv_choices(session.get('user_id')), error=error)
 
 @app.route("/metrics")
 @ensure_logged_in
@@ -157,12 +194,21 @@ def contact():
 def style(stylename):
     return app.send_static_file(stylename)
 
+@app.route("/imgUpload", methods=['GET', 'POST'])
+@ensure_logged_in
+def imgUpload():
+    try:
+        files = request.files.getlist('upload')
+        for file in files:
+            link = uploadImage(file)
+        return json.dumps({"uploaded": True, "url": link})
+    except Exception as e:
+        print("Error:", e)
+        return json.dumps({"uploaded": False, "error": {"message": "could not upload this image"}})
+
 @app.route("/<postname>")
 def get_post(postname):
-    if postname[-5] == ".html":
-        return file_from_store("posts/" + postname)
-    else:
-        return file_from_store("posts/" + postname + ".html")
+    return file_from_store(postname)
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=os.environ.get("PORT"))

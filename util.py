@@ -1,10 +1,29 @@
 import psycopg2
-
-import os, time
+import os
+import time
+import re
+import requests
+from base64 import b64encode
 
 from passlib.hash import sha256_crypt
 
+from flask import render_template
+
 DATABASE_URL = os.environ['DATABASE_URL']
+CLIENT_ID = os.environ['IMGUR_CLIENT_ID']
+
+def uploadImage(img):
+    headers = {
+        'Authorization': 'Client-ID ' +  CLIENT_ID
+    }
+
+    payload = {'image': b64encode(img.read())}
+    url = "https://api.imgur.com/3/image"
+
+    # requests.get("https://api.imgur.com/3/image/{id}")
+    resp = requests.post(url, headers=headers, data=payload)
+    lnk = resp.json()['data']['link']
+    return lnk
 
 def file_from_store(file_name):
     """
@@ -13,20 +32,22 @@ def file_from_store(file_name):
     Args:
     - file_name: name of file to retrieve
     """
-    with open(file_name, 'r') as f:
-        content = f.read()
-
-    return content
+    # TODO - correct if not found :)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    c = conn.cursor()
+    c.execute("SELECT title, content FROM posts WHERE slug = %s", (file_name,))
+    title, content = c.fetchall()[0]
+    return render_template("post.html", title=title, content=content)
 
 def get_posts():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
-    c.execute("SELECT * FROM posts;")
+    c.execute("SELECT slug, title, thumb, description FROM posts;")
     posts = c.fetchall()
-    ret = [{"href": p[1],
-            "title": p[0],
-            "image": p[5],
-            "description": p[4]} for p in posts]
+    ret = [{"href": p[0],
+            "title": p[1],
+            "image": p[2],
+            "description": p[3]} for p in posts]
 
     conn.close()
     return ret
@@ -81,15 +102,16 @@ def get_users():
     conn.close()
     return ret
 
-def add_post_to_database(title, slug, author_id, publish_date, thumb, description, content):
+def create_post(title, author_id, publish_date, thumb, description, content):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
 
-    # TODO - put actual post in store
+    slug = re.sub(r'\W+', '', title).lower()
 
-    # title TEXT, slug TEXT PRIMARY KEY, timestamp INTEGER, author_id INTEGER, description TEXT, thumb TEXT, publish_date INTEGER)
+    while c.execute("SELECT * FROM posts WHERE slug = %s", (slug,)) != None:
+        slug += str(os.urandom(2))
 
-    c.execute("INSERT INTO posts VALUES ({}, {}, {}, {}, {}, {}, {})".format(repr(title), repr(slug), int(time.time()), author_id, repr(description), repr(thumb), int(publish_date)))
+    c.execute("INSERT INTO posts VALUES ({}, {}, {}, {}, {}, {}, {}, {})".format(repr(title), repr(slug), int(time.time()), repr(author_id), repr(description), repr(thumb), int(time.mktime(time.strptime(publish_date, '%Y-%m-%d'))), repr(content)))
     conn.commit()
 
     conn.close()
@@ -134,8 +156,3 @@ def set_privileges(username, privs):
     c.execute("UPDATE users SET priveleges=%s WHERE username=%s;", (privs, username))
     conn.commit()
     conn.close()
-
-#add_post_to_database("Test Post", "testpost", 0, time.time(), "/res/david.jpg", "A second test post entry.")
-#print(create_user("admin", "admin"))
-#set_password("admin", "michelle obama")
-#print(validate_creds("admin", "michelle obama"))

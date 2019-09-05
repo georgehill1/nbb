@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="/styles/sidebar.css">
     <link rel="stylesheet" href="/styles/menu.css" />
     <link rel="stylesheet" href="/styles/settings.css" />
+    <link rel="stylesheet" href="/styles/post.css" />
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/12.4.0/classic/ckeditor.js"></script>
 </head>
 <body>
   <div class="sidebar">
@@ -18,19 +21,41 @@
   <div class="content">
     <h1>Upload New</h1>
     {% if privLvl == 0 %}
-      <form>
-        <input type="file" name=file><br>
-        <input type="text" name=title placeholder="Post Title"><br>
-        <textarea name=description placeholder="Description"></textarea><br>
-        <input type="file" name=image><br>
-        <input type="date" name="publish"><br>
-        <input type="submit" value=Upload>
-      </form>
+    <form method="post">
+      <input type="text" name=title placeholder="Post Title"><br>
+      <textarea name=description placeholder="Description"></textarea><br>
+      <label>Thumbnail</label>
+      <input type="file" name=thumb><br>
+      <label>Date to publish</label>
+      <input type="date" name="publish"><br>
+      <textarea name="content" id="editor">This is some sample content.</textarea>
+      <script>
+        ClassicEditor
+          .create( document.querySelector( '#editor' ), {
+            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockquote'],
+            heading: {
+              options: [
+                { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                { model: 'heading1', view: 'h2', title: 'Heading 1', class: 'ck-heading_heading1' },
+                { model: 'heading2', view: 'h3', title: 'Heading 2', class: 'ck-heading_heading2' },
+                { model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' }
+              ]
+            },
+            ckfinder: {
+              uploadUrl: '/imgUpload'
+            }
+          } )
+          .catch( error => {
+                  console.error( error );
+        } );
+      </script>
+      <input type="submit" value=Upload>
+    </form>
     {% else %}
-    <h2>Permission Denied</h2>
-    <p>
-      Sorry, you don't have permission to upload new posts. Try speaking to the sysadmin if you think this is a mistake.
-    </p>
+      <h2>Permission Denied</h2>
+      <p>
+        Sorry, you don't have permission to upload new posts. Try speaking to the sysadmin if you think this is a mistake.
+      </p>
     {% endif %}
   </div>
 </body>
