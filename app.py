@@ -48,9 +48,9 @@ def home_page():
 def get_image(image_name):
     return send_file("img/" + image_name)
 
-# @app.route("/favicon.ico")
-# def get_favicon():
-#     return get_image("favicon.ico")
+@app.route("/favicon.ico")
+def get_favicon():
+    return get_image("favicon.ico")
 
 # JSON spec
 # [
