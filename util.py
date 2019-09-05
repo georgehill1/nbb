@@ -101,7 +101,7 @@ def get_priv_choices(user):
 def privFromUser(user):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
-    c.execute("SELECT priveleges FROM users WHERE username = '{}';".format(user))
+    c.execute("SELECT priveleges FROM users WHERE username = '%s';", (user,))
     users = c.fetchone()
     ret = int(users[0])
     conn.close()
