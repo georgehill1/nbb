@@ -176,9 +176,8 @@ def metrics():
 
 @app.route("/random.html")
 def rando():
-    # TODO
     posts = get_posts();
-    r = random.randint(0, len(posts))
+    r = random.randint(0, len(posts)-1)
 
     return redirect(posts[r]['href'])
 

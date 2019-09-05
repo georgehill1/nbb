@@ -25,6 +25,10 @@ def uploadImage(img):
     lnk = resp.json()['data']['link']
     return lnk
 
+def notFound():
+    # TODO return render_template("notFound.html")
+    return "404 Not found", 404
+
 def file_from_store(file_name):
     """
     Get file contents to return from storage.
@@ -32,12 +36,15 @@ def file_from_store(file_name):
     Args:
     - file_name: name of file to retrieve
     """
-    # TODO - correct if not found :)
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     c = conn.cursor()
-    c.execute("SELECT title, content FROM posts WHERE slug = %s", (file_name,))
-    title, content = c.fetchall()[0]
-    return render_template("post.html", title=title, content=content)
+    try:
+        c.execute("SELECT title, content FROM posts WHERE slug = %s", (file_name,))
+        title, content = c.fetchall()[0]
+        return render_template("post.html", title=title, content=content)
+    except Exception as e:
+        print(e)
+        return notFound()
 
 def get_posts():
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
