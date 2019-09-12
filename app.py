@@ -90,7 +90,6 @@ def upload():
     if request.method == 'POST':
         try:
             file = request.files['thumb']
-            print(file)
             uploadedThumb = uploadImage(file)
             create_post(request.form['title'], session.get('user_id'), request.form['publish'], uploadedThumb, request.form['description'], request.form['content'])
             return "Success!"
@@ -184,7 +183,7 @@ def modifyuser(username):
 @app.route("/metrics")
 @ensure_logged_in
 def metrics():
-    return redirect("analytics.google.com")
+    return redirect("https://analytics.google.com")
 
 @app.route("/random.html")
 def rando():

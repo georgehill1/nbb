@@ -22,23 +22,24 @@
     <a class="active" href="/upload">Upload</a>
     <a href="/settings">Settings</a>
     <a href="/posts">Posts</a>
+    <a href="/metrics" target="_blank">Metrics</a>
     <a href="/logout">Log Out</a>
   </div>
   <div class="content">
     <h1>Upload New</h1>
     {% if privLvl != 3 %}
     <form method="post" enctype="multipart/form-data">
-      <input type="text" name=title placeholder="Post Title"></input><br>
-      <input type="text" name=description placeholder="Description"></input><br>
+      <input type="text" name=title placeholder="Post Title" required>{{ preContent.date }}</input><br>
+      <input type="text" name=description placeholder="Description" required>{{ preContent.date }}</input><br>
       <label>Thumbnail</label>
-      <input type="file" name=thumb></input><br>
+      <input type="file" name=thumb required>{{ preContent.thumb }}</input><br>
       <label>Date to publish</label>
-      <input type="date" name="publish"></input><br>
-      <textarea name="content" id="editor">{{ preContent|safe }}</textarea>
+      <input type="date" name="publish" required>{{ preContent.date }}</input><br>
+      <textarea name="content" id="editor">{{ preContent.content|safe }}</textarea>
       <script>
         ClassicEditor
           .create( document.querySelector( '#editor' ), {
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockquote'],
+            toolbar: ['heading', '|', 'undo', 'redo', '|', 'imageUpload', 'mediaEmbed', 'link', 'insertTable', '|', 'bulletedList', 'numberedList', 'blockquote', '|', 'bold', 'italic'],
             heading: {
               options: [
                 { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
